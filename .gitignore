@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# PTA datasets: the NG15 pickle alone is ~2 GB
+data/
+
+# Editor settings
+.vscode/

@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pta_sims"
+dynamic = ["version"]
+description = "Simulate compressed PTA data objects (noise-weighted inner products) for Prometheus."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    {name = "Aiden Gundersen", email = "52249413+aiden-g12321@users.noreply.github.com"},
+]
+keywords = ["pulsar-timing-array", "gravitational-waves", "simulation", "prometheus"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+dependencies = [
+    "numpy",
+    "scipy",
+    # Prometheus imports both but declares neither
+    "jax",
+    "numpyro",
+    # The released 0.1.2 wheel predates the named-Fourier-basis Data layout
+    # (Data.gram, Data.basis_names, PTAModel.psr_models) that pta_sims is
+    # written against, and carries the same version number, so a version
+    # specifier cannot tell the two apart. Take it from the repository.
+    "prometheus @ git+https://github.com/XGI-MSU/prometheus.git",
+]
+
+[project.optional-dependencies]
+examples = ["matplotlib", "corner", "healpy", "enterprise-extensions", "ipykernel"]
+test = ["pytest"]
+
+[project.urls]
+Homepage = "https://github.com/aiden-g12321/pta_sims"
+Issues = "https://github.com/aiden-g12321/pta_sims/issues"
+
+[tool.setuptools.dynamic]
+version = {attr = "pta_sims.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["pta_sims*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "slow: takes tens of seconds or more (deselect with '-m \"not slow\"')",
+]
