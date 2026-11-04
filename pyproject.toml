@@ -29,6 +29,11 @@ dependencies = [
     # Prometheus imports both but declares neither
     "jax",
     "numpyro",
+    # Reached through prometheus -> enterprise-pulsar, which already caps it;
+    # stated here so the cap does not depend on that. scikit-sparse 0.5 needs
+    # SuiteSparse 7 (it uses the CHOLMOD 5 `sbound`/`nsbounds_hit` fields) and
+    # will not compile against the SuiteSparse 5 that most distributions ship.
+    "scikit-sparse<0.5",
     # The released 0.1.2 wheel predates the named-Fourier-basis Data layout
     # (Data.gram, Data.basis_names, PTAModel.psr_models) that pta_sims is
     # written against, and carries the same version number, so a version

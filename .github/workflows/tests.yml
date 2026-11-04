@@ -6,14 +6,12 @@ on:
   pull_request:
 
 jobs:
-  core:
-    # The array-level core, on numpy and scipy alone -- which is most of
-    # pta_sims. test_sampling skips itself without numpyro, and test_ng15
-    # without Prometheus and the NG15 pickle.
+  tests:
     runs-on: ubuntu-latest
     env:
+      JAX_PLATFORMS: cpu
       # The brute-force comparisons do many draws on small matrices, where
-      # multi-threaded BLAS costs far more than it saves.
+      # multi-threaded BLAS costs far more time synchronizing than it saves.
       OMP_NUM_THREADS: 1
       OPENBLAS_NUM_THREADS: 1
       MKL_NUM_THREADS: 1
@@ -27,23 +25,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-      - run: pip install -e '.[test]'
-      - run: pytest -m "not slow" -q
 
-  sampling:
-    # Adds numpyro so the NUTS watchdog tests run too. Prometheus and the
-    # 2 GB NG15 pickle are not available on a runner, so test_ng15 still skips.
-    runs-on: ubuntu-latest
-    env:
-      JAX_PLATFORMS: cpu
-      OMP_NUM_THREADS: 1
-      OPENBLAS_NUM_THREADS: 1
-      MKL_NUM_THREADS: 1
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: pip
-      - run: pip install -e '.[test]' jax numpyro
+      # Prometheus depends on enterprise-pulsar, which pins scikit-sparse.
+      # scikit-sparse publishes no wheels at all, so pip builds it from its
+      # sdist against SuiteSparse, which a bare runner does not carry.
+      - run: sudo apt-get update && sudo apt-get install -y libsuitesparse-dev
+
+      - run: pip install -e '.[test]'
+
+      # test_ng15 skips itself: the 2 GB NG15 pickle is not on the runner.
       - run: pytest -m "not slow" -q

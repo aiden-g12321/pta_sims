@@ -1,25 +1,18 @@
 # pta_sims
 
-Simulate pulsar timing array datasets for
-[Prometheus](https://github.com/XGI-MSU/prometheus) at the level the sampler
-actually consumes — the noise-weighted inner products — rather than by
-generating TOAs and refitting a timing model.
+Simulate pulsar timing array datasets for the 
+[Prometheus](https://github.com/XGI-MSU/prometheus) package. Rather than simulating TOAs and refitting a timing model, we simulate the noise-weighted inner products ("TNT", "TNr", etc.) used in the likelihood evaluation.
 
-Hand it a `prometheus.pta_model.PTAModel` and a set of hyper-parameters, and get
-back a statistically consistent `prometheus.data.Data`, ready to sample. The
-array geometry — TOA sampling, timing model, measured white noise — is reused
-untouched, so "NG15 pulsars, NG15 white noise, my own background and my own
-continuous wave" is a handful of lines.
+Given a `prometheus.pta_model.PTAModel` object and a set of hyper-parameters, **pta_sims** will return a statistically consistent `prometheus.data.Data`, ready to sample. The
+array geometry — TOAs, timing model, measured white noise — is reused
+untouched, so simulating NG15-like data with a custom GWB and CW is easy.
 
 
 ## Install
 
 ```bash
-pip install -e .
+pip install git+https://github.com/aiden-g12321/pta_sims.git
 ```
-
-Prometheus comes with it, from its repository. Add `'.[examples]'` for what the
-notebooks import, or `'.[test]'` for pytest.
 
 
 ## Usage
@@ -46,16 +39,11 @@ sim.pta_model  # the same model, rebound to it
 sim.truth      # injected amplitudes, SNR, hyper-parameters
 ```
 
-The model defines everything about the simulation except the hyper-parameter
-values, and it is also the model you then sample, so the injection and the
-recovery cannot drift apart. `load_data` takes any Prometheus `Data`; the NG15
-pickle above is ~2 GB and is not distributed here.
-
-Worked examples, injection through recovery:
+Worked examples:
 [`ng15_stochastic_pe.ipynb`](examples/ng15_stochastic_pe.ipynb) for red noise
 and a Hellings–Downs background, and
-[`ng15_cw_pe.ipynb`](examples/ng15_cw_pe.ipynb) for the same with a continuous
-wave on top.
+[`ng15_cw_pe.ipynb`](examples/ng15_cw_pe.ipynb) for the same with an additional continuous
+wave.
 
 
 ## How it works
